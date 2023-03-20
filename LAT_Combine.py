@@ -37,7 +37,7 @@ def main():
         st.subheader("Encrypt using Combine Cipher")
         text = st.text_input("Enter the text to be encrypted", "")
         shift = st.number_input("Enter the shift value", value=0, step=1, min_value=0, max_value=25)
-        key = st.text_input("Enter the key (26 alphabets only)", "qwertyuiopasdfghjklzxcvbnm")
+        key = st.text_input("Enter the key (26 alphabets only)", "qwertyuiopasdfghjklzxcvbnm",type="password")
         if st.button("Encrypt"):
             if len(key) != 26:
                 st.error("Key should have 26 alphabets only")
