@@ -12,90 +12,45 @@ def generate_key():
 def load_key():
     return open("secret.key", "rb").read()
 
-def encrypt_file(file_path, key):
-    with open(file_path, "rb") as file:
-        file_data = file.read()
-
+def encrypt_data(data, key):
     # Generate a random initialization vector (IV)
     iv = os.urandom(16)
 
     # Create a cipher object with AES algorithm and CBC mode
     cipher = Cipher(algorithms.AES(key), modes.CBC(iv))
 
-    # Encrypt the file data using the cipher object
-    encryptor = cipher.encryptor()
-    padded_data = encryptor.update(pad_data(file_data)) + encryptor.finalize()
-
-    # Write the encrypted data and IV to a new file
-    with open(f"{file_path}.enc", "wb") as file:
-        file.write(iv + padded_data)
-
-    return f"{file_path}.enc"
-
-def decrypt_file(file_path, key):
-    with open(file_path, "rb") as file:
-        file_data = file.read()
-
-    # Get the IV from the file data
-    iv = file_data[:16]
-
-    # Create a cipher object with AES algorithm and CBC mode
-    cipher = Cipher(algorithms.AES(key), modes.CBC(iv))
-
-    # Decrypt the file data using the cipher object
-    decryptor = cipher.decryptor()
-    decrypted_data = decryptor.update(file_data[16:]) + decryptor.finalize()
-
-    # Remove padding from decrypted data
-    unpadder = padding.PKCS7(128).unpadder()
-    unpadded_data = unpadder.update(decrypted_data) + unpadder.finalize()
-
-    # Write the decrypted data to a new file
-    with open(f"{file_path}.dec", "wb") as file:
-        file.write(unpadded_data)
-
-    return f"{file_path}.dec"
-
-def pad_data(data):
+    # Pad the data
     padder = padding.PKCS7(128).padder()
-    return padder.update(data) + padder.finalize()
+    padded_data = padder.update(data.encode()) + padder.finalize()
+
+    # Encrypt the data using the cipher object
+    encryptor = cipher.encryptor()
+    encrypted_data = encryptor.update(padded_data) + encryptor.finalize()
+
+    # Combine the IV and encrypted data
+    combined_data = iv + encrypted_data
+
+    # Return the encrypted data as a base64-encoded string
+    return combined_data.hex()
 
 def main():
-    file_path = "example.txt"
     generate_key()
     key = load_key()
-    encrypted_file_path = encrypt_file(file_path, key)
-    decrypted_file_path = decrypt_file(encrypted_file_path, key)
+    data = "This is a secret message."
+    encrypted_data = encrypt_data(data, key)
+    print(f"Encrypted data: {encrypted_data}")
 
 if __name__ == '__main__':
     main()
 
 # Streamlit app
-st.title("AES Encryption and Decryption")
+st.title("AES Encryption")
 
-st.header("Upload a file to encrypt")
+st.header("Encrypt some data")
 
-uploaded_file = st.file_uploader("Choose a file")
+data = st.text_input("Enter some data to encrypt")
 
-if uploaded_file is not None:
-    # Save the file to a temporary location
-    with open("temp.txt", "wb") as file:
-        file.write(uploaded_file.getvalue())
-
-    # Encrypt the file using AES
+if st.button("Encrypt"):
     key = load_key()
-    encrypted_file_path = encrypt_file("temp.txt", key)
-
-    # Download the encrypted file
-    st.download_button("Download encrypted file", data=open(encrypted_file_path, "rb").read(), file_name=encrypted_file_path)
-
-st.header("Upload a file to decrypt")
-
-uploaded_file = st.file_uploader("Choose a file")
-
-if uploaded_file is not None:
-    # Save the file to a temporary location
-    with open("temp.txt.enc", "wb") as file:
-        file.write(uploaded_file.getvalue())
-
-   
+    encrypted_data = encrypt_data(data, key)
+    st.write(f"Encrypted data: {encrypted_data}")
