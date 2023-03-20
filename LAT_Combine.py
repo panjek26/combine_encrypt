@@ -33,30 +33,11 @@ def main():
     st.title("Cipher")
     option = st.sidebar.selectbox("Select the Cipher", ["Combine Cipher"])
 
-    if option == "Caesar Cipher":
-        st.subheader("Encrypt using Caesar Cipher")
-        text = st.text_input("Enter the text to be encrypted", "")
-        shift = st.number_input("Enter the shift value", value=0, step=1, min_value=0, max_value=25)
-        if st.button("Encrypt"):
-            encrypted_text = caesar_cipher(text, shift)
-            st.success("Encrypted Text: {}".format(encrypted_text))
-
-    elif option == "Substitution Cipher":
-        st.subheader("Encrypt using Substitution Cipher")
-        text = st.text_input("Enter the text to be encrypted", "")
-        key = st.text_input("Enter the key (26 alphabets only)", "")
-        if st.button("Encrypt"):
-            if len(key) != 26:
-                st.error("Key should have 26 alphabets only")
-            else:
-                encrypted_text = substitution_cipher(text, key)
-                st.success("Encrypted Text: {}".format(encrypted_text))
-
-    elif option == "Combine Cipher":
+    if option == "Combine Cipher":
         st.subheader("Encrypt using Combine Cipher")
         text = st.text_input("Enter the text to be encrypted", "")
         shift = st.number_input("Enter the shift value", value=0, step=1, min_value=0, max_value=25)
-        key = st.text_input("Enter the key (26 alphabets only)", "qwertyuiopasdfghjklzxcvbnm")
+        key = st.password_input("Enter the key (26 alphabets only)", "qwertyuiopasdfghjklzxcvbnm")
         if st.button("Encrypt"):
             if len(key) != 26:
                 st.error("Key should have 26 alphabets only")
