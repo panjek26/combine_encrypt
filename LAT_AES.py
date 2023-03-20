@@ -33,24 +33,22 @@ def encrypt_data(data, key):
     # Return the encrypted data as a base64-encoded string
     return combined_data.hex()
 
+def decrypt_data(data, key):
+    # Decode the hexadecimal-encoded input data
+    data = bytes.fromhex(data)
+
+    # Split the data into the IV and encrypted data
+    iv, encrypted_data = data[:16], data[16:]
+
+    # Create a cipher object with AES algorithm and CBC mode
+    cipher = AES.new(key, AES.MODE_CBC, iv)
+
+    # Decrypt the data using the cipher object
+    decrypted_data = cipher.decrypt(encrypted_data)
+
+    # Remove the padding from the decrypted data
+    length = decrypted_data[-1]
+    return decrypted_data[:-length].decode()
+
 def main():
-    generate_key()
-    key = load_key()
-    data = "This is a secret message."
-    encrypted_data = encrypt_data(data.encode(), key)
-    print(f"Encrypted data: {encrypted_data}")
-
-if __name__ == '__main__':
-    main()
-
-# Streamlit app
-st.title("AES Encryption")
-
-st.header("Encrypt some data")
-
-data = st.text_input("Enter some data to encrypt")
-
-if st.button("Encrypt"):
-    key = load_key()
-    encrypted_data = encrypt_data(data.encode(), key)
-    st.write(f"Encrypted data: {encrypted_data}")
+    generate_key
