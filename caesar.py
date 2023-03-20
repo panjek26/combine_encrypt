@@ -1,7 +1,4 @@
-from flask import Flask, render_template, request
 import streamlit as st
-
-app = Flask(__name__)
 
 def caesar_cipher(text, shift):
     result = ''
@@ -27,27 +24,28 @@ def substitution_cipher(text, key):
             result += char
     return result
 
-@app.route('/')
-def home():
-    return render_template('home.html')
+def main():
+    st.title("Cipher")
+    option = st.sidebar.selectbox("Select the Cipher", ["Caesar Cipher", "Substitution Cipher"])
 
-@app.route('/caesar', methods=['GET', 'POST'])
-def caesar():
-    if request.method == 'POST':
-        text = request.form['text']
-        shift = int(request.form['shift'])
-        encrypted_text = caesar_cipher(text, shift)
-        return render_template('caesar.html', encrypted_text=encrypted_text)
-    return render_template('caesar.html')
+    if option == "Caesar Cipher":
+        st.subheader("Encrypt using Caesar Cipher")
+        text = st.text_input("Enter the text to be encrypted", "")
+        shift = st.number_input("Enter the shift value", value=0, step=1, min_value=0, max_value=25)
+        if st.button("Encrypt"):
+            encrypted_text = caesar_cipher(text, shift)
+            st.success("Encrypted Text: {}".format(encrypted_text))
 
-@app.route('/substitution', methods=['GET', 'POST'])
-def substitution():
-    if request.method == 'POST':
-        text = request.form['text']
-        key = request.form['key']
-        encrypted_text = substitution_cipher(text, key)
-        return render_template('substitution.html', encrypted_text=encrypted_text)
-    return render_template('substitution.html')
+    elif option == "Substitution Cipher":
+        st.subheader("Encrypt using Substitution Cipher")
+        text = st.text_input("Enter the text to be encrypted", "")
+        key = st.text_input("Enter the key (26 alphabets only)", "")
+        if st.button("Encrypt"):
+            if len(key) != 26:
+                st.error("Key should have 26 alphabets only")
+            else:
+                encrypted_text = substitution_cipher(text, key)
+                st.success("Encrypted Text: {}".format(encrypted_text))
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    main()
