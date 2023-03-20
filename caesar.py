@@ -1,68 +1,66 @@
-import streamlit as st
+from cryptography.fernet import Fernet
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from cryptography.hazmat.primitives import padding
+import os
 
-def caesar_cipher(text, shift):
-    result = ''
-    for char in text:
-        if char.isalpha():
-            if char.isupper():
-                result += chr((ord(char) + shift - 65) % 26 + 65)
-            else:
-                result += chr((ord(char) + shift - 97) % 26 + 97)
-        else:
-            result += char
-    return result
+def generate_key():
+    key = Fernet.generate_key()
+    with open("secret.key", "wb") as key_file:
+        key_file.write(key)
 
-def substitution_cipher(text, key):
-    result = ''
-    for char in text:
-        if char.isalpha():
-            if char.isupper():
-                result += key[ord(char) - 65].upper()
-            else:
-                result += key[ord(char) - 97]
-        else:
-            result += char
-    return result
+def load_key():
+    return open("secret.key", "rb").read()
 
-def combine_cipher(text, shift, key):
-    text = caesar_cipher(text, shift)
-    text = substitution_cipher(text, key)
-    return text
+def encrypt_file(file_path, key):
+    with open(file_path, "rb") as file:
+        file_data = file.read()
+
+    # Generate a random initialization vector (IV)
+    iv = os.urandom(16)
+
+    # Create a cipher object with AES algorithm and CBC mode
+    cipher = Cipher(algorithms.AES(key), modes.CBC(iv))
+
+    # Encrypt the file data using the cipher object
+    encryptor = cipher.encryptor()
+    padded_data = encryptor.update(pad_data(file_data)) + encryptor.finalize()
+
+    # Write the encrypted data and IV to a new file
+    with open(f"{file_path}.enc", "wb") as file:
+        file.write(iv + padded_data)
+
+def decrypt_file(file_path, key):
+    with open(file_path, "rb") as file:
+        file_data = file.read()
+
+    # Get the IV from the file data
+    iv = file_data[:16]
+
+    # Create a cipher object with AES algorithm and CBC mode
+    cipher = Cipher(algorithms.AES(key), modes.CBC(iv))
+
+    # Decrypt the file data using the cipher object
+    decryptor = cipher.decryptor()
+    decrypted_data = decryptor.update(file_data[16:]) + decryptor.finalize()
+
+    # Remove padding from decrypted data
+    unpadder = padding.PKCS7(128).unpadder()
+    unpadded_data = unpadder.update(decrypted_data) + unpadder.finalize()
+
+    # Write the decrypted data to a new file
+    with open(f"{file_path}.dec", "wb") as file:
+        file.write(unpadded_data)
+
+def pad_data(data):
+    padder = padding.PKCS7(128).padder()
+    return padder.update(data) + padder.finalize()
 
 def main():
-    st.title("Cipher")
-    option = st.sidebar.selectbox("Select the Cipher", ["Caesar Cipher", "Substitution Cipher", "Combine Cipher"])
-
-    if option == "Caesar Cipher":
-        st.subheader("Encrypt using Caesar Cipher")
-        text = st.text_input("Enter the text to be encrypted", "")
-        shift = st.number_input("Enter the shift value", value=0, step=1, min_value=0, max_value=25)
-        if st.button("Encrypt"):
-            encrypted_text = caesar_cipher(text, shift)
-            st.success("Encrypted Text: {}".format(encrypted_text))
-
-    elif option == "Substitution Cipher":
-        st.subheader("Encrypt using Substitution Cipher")
-        text = st.text_input("Enter the text to be encrypted", "")
-        key = st.text_input("Enter the key (26 alphabets only)", "")
-        if st.button("Encrypt"):
-            if len(key) != 26:
-                st.error("Key should have 26 alphabets only")
-            else:
-                encrypted_text = substitution_cipher(text, key)
-                st.success("Encrypted Text: {}".format(encrypted_text))
-
-    elif option == "Combine Cipher":
-        st.subheader("Encrypt using Combine Cipher")
-        text = st.text_input("Enter the text to be encrypted", "")
-        shift = st.number_input("Enter the shift value", value=0, step=1, min_value=0, max_value=25)
-        key = st.text_input("Enter the key (26 alphabets only)", "")
-        if st.button("Encrypt"):
-            if len(key) != 26:
-                st.error("Key should have 26 alphabets only")
-            else:
-                encrypted_text = combine_cipher(text, shift, key)
-                st.success("Encrypted Text: {}".format(encrypted_text))
+    file_path = "example.txt"
+    generate_key()
+    key = load_key()
+    encrypt_file(file_path, key)
+    decrypt_file(f"{file_path}.enc", key)
 
 if __name__ == '__main__':
     main()
