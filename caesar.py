@@ -24,9 +24,14 @@ def substitution_cipher(text, key):
             result += char
     return result
 
+def combine_cipher(text, shift, key):
+    text = caesar_cipher(text, shift)
+    text = substitution_cipher(text, key)
+    return text
+
 def main():
     st.title("Cipher")
-    option = st.sidebar.selectbox("Select the Cipher", ["Caesar Cipher", "Substitution Cipher"])
+    option = st.sidebar.selectbox("Select the Cipher", ["Caesar Cipher", "Substitution Cipher", "Combine Cipher"])
 
     if option == "Caesar Cipher":
         st.subheader("Encrypt using Caesar Cipher")
@@ -45,6 +50,18 @@ def main():
                 st.error("Key should have 26 alphabets only")
             else:
                 encrypted_text = substitution_cipher(text, key)
+                st.success("Encrypted Text: {}".format(encrypted_text))
+
+    elif option == "Combine Cipher":
+        st.subheader("Encrypt using Combine Cipher")
+        text = st.text_input("Enter the text to be encrypted", "")
+        shift = st.number_input("Enter the shift value", value=0, step=1, min_value=0, max_value=25)
+        key = st.text_input("Enter the key (26 alphabets only)", "")
+        if st.button("Encrypt"):
+            if len(key) != 26:
+                st.error("Key should have 26 alphabets only")
+            else:
+                encrypted_text = combine_cipher(text, shift, key)
                 st.success("Encrypted Text: {}".format(encrypted_text))
 
 if __name__ == '__main__':
