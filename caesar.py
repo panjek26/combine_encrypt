@@ -1,6 +1,5 @@
 import streamlit as st
-from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
-from cryptography.hazmat.backends import default_backend
+from Crypto.Cipher import AES
 import os
 
 def generate_key():
@@ -11,16 +10,22 @@ def generate_key():
 def load_key():
     return open("secret.key", "rb").read()
 
+def pad(data):
+    length = AES.block_size - (len(data) % AES.block_size)
+    return data + (chr(length) * length).encode()
+
 def encrypt_data(data, key):
     # Generate a random initialization vector (IV)
     iv = os.urandom(16)
 
-    # Create a cipher object with Blowfish algorithm and CBC mode
-    cipher = Cipher(algorithms.Blowfish(key), modes.CBC(iv), backend=default_backend())
+    # Create a cipher object with AES algorithm and CBC mode
+    cipher = AES.new(key, AES.MODE_CBC, iv)
+
+    # Pad the data
+    padded_data = pad(data)
 
     # Encrypt the data using the cipher object
-    encryptor = cipher.encryptor()
-    encrypted_data = encryptor.update(data.encode()) + encryptor.finalize()
+    encrypted_data = cipher.encrypt(padded_data)
 
     # Combine the IV and encrypted data
     combined_data = iv + encrypted_data
@@ -32,14 +37,14 @@ def main():
     generate_key()
     key = load_key()
     data = "This is a secret message."
-    encrypted_data = encrypt_data(data, key)
+    encrypted_data = encrypt_data(data.encode(), key)
     print(f"Encrypted data: {encrypted_data}")
 
 if __name__ == '__main__':
     main()
 
 # Streamlit app
-st.title("Blowfish Encryption")
+st.title("AES Encryption")
 
 st.header("Encrypt some data")
 
@@ -47,5 +52,5 @@ data = st.text_input("Enter some data to encrypt")
 
 if st.button("Encrypt"):
     key = load_key()
-    encrypted_data = encrypt_data(data, key)
+    encrypted_data = encrypt_data(data.encode(), key)
     st.write(f"Encrypted data: {encrypted_data}")
