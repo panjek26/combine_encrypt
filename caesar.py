@@ -1,3 +1,4 @@
+import streamlit as st
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives import padding
@@ -29,6 +30,8 @@ def encrypt_file(file_path, key):
     with open(f"{file_path}.enc", "wb") as file:
         file.write(iv + padded_data)
 
+    return f"{file_path}.enc"
+
 def decrypt_file(file_path, key):
     with open(file_path, "rb") as file:
         file_data = file.read()
@@ -51,6 +54,8 @@ def decrypt_file(file_path, key):
     with open(f"{file_path}.dec", "wb") as file:
         file.write(unpadded_data)
 
+    return f"{file_path}.dec"
+
 def pad_data(data):
     padder = padding.PKCS7(128).padder()
     return padder.update(data) + padder.finalize()
@@ -59,8 +64,38 @@ def main():
     file_path = "example.txt"
     generate_key()
     key = load_key()
-    encrypt_file(file_path, key)
-    decrypt_file(f"{file_path}.enc", key)
+    encrypted_file_path = encrypt_file(file_path, key)
+    decrypted_file_path = decrypt_file(encrypted_file_path, key)
 
 if __name__ == '__main__':
     main()
+
+# Streamlit app
+st.title("AES Encryption and Decryption")
+
+st.header("Upload a file to encrypt")
+
+uploaded_file = st.file_uploader("Choose a file")
+
+if uploaded_file is not None:
+    # Save the file to a temporary location
+    with open("temp.txt", "wb") as file:
+        file.write(uploaded_file.getvalue())
+
+    # Encrypt the file using AES
+    key = load_key()
+    encrypted_file_path = encrypt_file("temp.txt", key)
+
+    # Download the encrypted file
+    st.download_button("Download encrypted file", data=open(encrypted_file_path, "rb").read(), file_name=encrypted_file_path)
+
+st.header("Upload a file to decrypt")
+
+uploaded_file = st.file_uploader("Choose a file")
+
+if uploaded_file is not None:
+    # Save the file to a temporary location
+    with open("temp.txt.enc", "wb") as file:
+        file.write(uploaded_file.getvalue())
+
+   
