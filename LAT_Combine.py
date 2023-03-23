@@ -44,7 +44,8 @@ def dec_substitution_cipher(text, key):
             index = key.find(char)
             result += chr(index + 65)
         else:
-            result += char
+            index = key.find(char)
+            result += chr(index + 97)
     return result.lower()
 
 def combine_cipher(text, shift, key):
