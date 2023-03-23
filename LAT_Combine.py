@@ -31,7 +31,7 @@ def combine_cipher(text, shift, key):
 
 def main():
     st.title("Cipher")
-    option = st.sidebar.selectbox("Select the Cipher", ["Encrypt Combine Cipher"],["Decrypt Combine Cipher"])
+    option = st.sidebar.selectbox("Select the Cipher", ["Encrypt Combine Cipher", "Decrypt Combine Cipher"])
 
     if option == "Combine Cipher":
         st.subheader("Encrypt using Combine Cipher")
