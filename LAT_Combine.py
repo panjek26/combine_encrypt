@@ -38,14 +38,14 @@ def dec_caesar_cipher(text, shift):
     return result
 
 def dec_substitution_cipher(text, key):
-    plaintext = ''
+    result = ''
     for char in text:
         if char.isalpha():
             index = key.find(char)
-            plaintext += chr(index + 65)
+            result += chr(index + 65)
         else:
-            plaintext += char
-    return plaintext.lower()
+            result += char
+    return result.lower()
 
 def combine_cipher(text, shift, key):
     text = caesar_cipher(text, shift)
@@ -53,8 +53,8 @@ def combine_cipher(text, shift, key):
     return text
 
 def decrypt_combine_cipher(text, shift, key):
-    text = dec_caesar_cipher(text, shift)
     text = dec_substitution_cipher(text, key)
+    text = dec_caesar_cipher(text, shift)
     return text
 
 def main():
