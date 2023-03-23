@@ -41,11 +41,15 @@ def dec_substitution_cipher(text, key):
     result = ''
     for char in text:
         if char.isalpha():
-            index = key.find(char)
-            result += chr(index + 65)
+            if char.isupper():
+              index = key.find(char)
+              result += chr(index + 65).upper
+            else:
+              index = key.find(char)
+              result += chr(index + 97)
+
         else:
-            index = key.find(char)
-            result += chr(index + 97)
+          result += char
     return result.lower()
 
 def combine_cipher(text, shift, key):
