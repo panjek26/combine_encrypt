@@ -55,8 +55,8 @@ def combine_cipher(text, shift, key):
     return text
 
 def decrypt_combine_cipher(text, shift, key):
-    # text = dec_substitution_cipher(text, key)
     text = dec_caesar_cipher(text, shift)
+    text = dec_substitution_cipher(text, key)
     return text
 
 def main():
