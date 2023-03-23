@@ -29,6 +29,11 @@ def combine_cipher(text, shift, key):
     text = substitution_cipher(text, key)
     return text
 
+def decrypt_combine_cipher(text, shift, key):
+    text = caesar_cipher(text, shift)
+    text = substitution_cipher(text, key)
+    return text
+
 def main():
     st.title("Cipher")
     option = st.sidebar.selectbox("Select the Cipher", ["Encrypt Combine Cipher", "Decrypt Combine Cipher"])
@@ -44,6 +49,18 @@ def main():
             else:
                 encrypted_text = combine_cipher(text, shift, key)
                 st.success("Encrypted Text: {}".format(encrypted_text))
+    elif option == "Decrypt Combine Cipher":
+        st.subheader("Decrypt using Combine Cipher")
+        text = st.text_input("Enter the text to be decrypted", "")
+        shift = st.number_input("Enter the shift value", value=0, step=1, min_value=0, max_value=25)
+        key = st.text_input("Enter the key (26 alphabets only)", "qwertyuiopasdfghjklzxcvbnm",type="password")
+        if st.button("Decrypt"):
+            if len(key) != 26:
+                st.error("Key should have 26 alphabets only")
+            else:
+                encrypted_text = decrypt_combine_cipher(text, shift, key)
+                st.success("Decrypted Text: {}".format(encrypted_text))
+
 
 if __name__ == '__main__':
     main()
