@@ -24,14 +24,39 @@ def substitution_cipher(text, key):
             result += char
     return result
 
+
+def dec_caesar_cipher(text, shift):
+    result = ''
+    for char in text:
+        if char.isalpha():
+            if char.isupper():
+                result += chr((ord(char) - shift + 65) % 26 - 65)
+            else:
+                result += chr((ord(char) - shift + 97) % 26 - 97)
+        else:
+            result += char
+    return result
+
+def dec_substitution_cipher(text, key):
+    result = ''
+    for char in text:
+        if char.isalpha():
+            if char.isupper():
+                result += key[ord(char) + 65].upper()
+            else:
+                result += key[ord(char) + 97]
+        else:
+            result += char
+    return result
+
 def combine_cipher(text, shift, key):
     text = caesar_cipher(text, shift)
     text = substitution_cipher(text, key)
     return text
 
 def decrypt_combine_cipher(text, shift, key):
-    text = caesar_cipher(text, shift)
-    text = substitution_cipher(text, key)
+    text = dec_caesar_cipher(text, shift)
+    text = dec_substitution_cipher(text, key)
     return text
 
 def main():
