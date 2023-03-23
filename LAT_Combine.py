@@ -33,7 +33,7 @@ def main():
     st.title("Cipher")
     option = st.sidebar.selectbox("Select the Cipher", ["Encrypt Combine Cipher", "Decrypt Combine Cipher"])
 
-    if option == "Combine Cipher":
+    if option == "Encrypt Combine Cipher":
         st.subheader("Encrypt using Combine Cipher")
         text = st.text_input("Enter the text to be encrypted", "")
         shift = st.number_input("Enter the shift value", value=0, step=1, min_value=0, max_value=25)
